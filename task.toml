@@ -1,0 +1,30 @@
+artifacts = ["/app/output/recovered_cdc.json"]
+
+[task]
+name = "afterquery/cdc-cutover-replay"
+
+[metadata]
+author_name = "Thomas Morison"
+author_email = "matiasv931026@gmail.com"
+difficulty_explanation = "The hard part is the dependent state reconstruction, not byte parsing. A solver must recover one crash-consistent checkpoint from several physically valid mirrored-redo branches, carry those candidates through later row observations, reconstruct the original GTID failover chain, preserve transaction-local MINIMAL/JSON/XA state across schema and partition changes, and then handle a terminal promotion that merges two diverged GTID histories. The merge server contains a damaged log_slave_updates prefix from both branches: its local durable order is required to reconstruct the state entering the final native transactions, while missing row frames must still be recovered from the origin captures and origin XIDs remain the output commit coordinates. The side branch also contains a committed transaction that the merge frontier excludes, so treating every locally committed branch transaction as authoritative is wrong. Earlier partition EXCHANGE, prepared-XA, cross-partition key moves, and partial transaction copies still feed into this merge state. Plausible failures include following a single linear promotion chain, grouping branch transactions by origin, trusting the merge copy as a complete transaction source, using origin commit order instead of the merge server's durable order, retaining the stranded side-branch transaction, or losing the older redo/MVCC/partition dependencies. The supplied evidence_codec.py only removes primitive binary-format boilerplate; it does not assemble history, choose recovery branches, recover cross-branch durability order, or build the feed. The synthetic evidence models production InnoDB crash recovery, GTID failover, row-based CDC, log_slave_updates, side-branch reconciliation, XA, partial JSON updates, and partition maintenance. This is representative of work done by MySQL storage, replication, and CDC reliability engineers after a crash and manual failover/rejoin. With the low-level decoder provided, a focused expert should expect about five to six hours to inspect the evidence, implement the state model, and validate near misses."
+solution_explanation = "The reference uses the solver-visible evidence_codec.py only for primitive record decoding; stream assembly, redo application, partial-copy ordering, and recovery decisions remain in the reference. It derives crash-local checkpoint candidates from page copies, mirrored redo, transaction history, undo, and the saved read view; carries those candidates into later CDC evidence until one remains; reconstructs the ordinary promotion chain; maintains catalog, TABLE_MAP, MINIMAL, PARTIAL_UPDATE_ROWS, XA, partition EXCHANGE, and primary-key movement state; and then detects the terminal multi-origin handoff. For that handoff it replays the shared history to the fork point, uses the merge server's pre-native replicated prefix as the durable cross-branch order, combines damaged merge copies with origin copies for complete row events, excludes branch GTIDs absent from the final frontier, and keeps origin commit coordinates while applying transactions in merge durability order. It finally replays the terminal server's native transactions through the stop coordinate and emits only logical sales.orders changes."
+verification_explanation = "The verifier reads only /app/output/recovered_cdc.json. It checks the documented schema, recovery stop, authoritative cutover, exact ordered transaction list, and every canonical logical change against sealed truth derived from the solver-visible evidence. Candidate code is never imported or executed. JSON object-key order is ignored; transaction order, GTID, origin commit coordinate, one-based ordinal, primary-key semantics, source object identity, schema epoch, and complete before/after rows are semantic fields defined by the instruction and recovery contract. Missing, malformed, partial, wrong-lineage, stale-checkpoint, duplicate-GTID, stale-catalog, partial-JSON, XA-ordering, or after-stop outputs fail. The harness initializes reward to 0 and writes 1 only when all pytest checks pass."
+category = "Software"
+subcategory = "Databases"
+tags = ["mysql", "cdc", "gtid", "failover", "log-slave-updates", "xa", "online-schema-migration", "partition-exchange"]
+expert_time_estimate_hours = 5.5
+relevant_experience = "MySQL/InnoDB recovery and row-based replication or CDC, including MVCC/undo, GTID failover, log_slave_updates and branch rejoin behavior, TABLE_MAP/schema evolution, MINIMAL row images, XA recovery, and partition EXCHANGE semantics."
+
+[verifier]
+timeout_sec = 120
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 7200
+
+[environment]
+build_timeout_sec = 600
+cpus = 2
+memory_mb = 2048
+storage_mb = 4096
+gpus = 0

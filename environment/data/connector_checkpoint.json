@@ -1,0 +1,23 @@
+{
+  "canonical_columns": [
+    "id",
+    "customer_id",
+    "amount_cents",
+    "status",
+    "note",
+    "tax_cents"
+  ],
+  "checkpoint": {
+    "file": "mysql-bin.000042",
+    "pos": 3684
+  },
+  "checkpoint_source_uuid": "8f6f2d9a-4e31-4b6e-9d77-4df0b1ea0c42",
+  "delivered_gtids": "8f6f2d9a-4e31-4b6e-9d77-4df0b1ea0c42:1-1000",
+  "row_image": "MINIMAL",
+  "stop": {
+    "file": "mysql-bin.000070",
+    "pos": 4542
+  },
+  "stop_source_uuid": "d94f30b1-7a62-4d38-ae15-84c20f6b9713",
+  "tracked_table": "sales.orders"
+}

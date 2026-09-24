@@ -1,0 +1,14 @@
+{
+  "base_prev_crc32": 0,
+  "first_sequence": 0,
+  "format_version": 2,
+  "last_sequence": 7,
+  "mirror_files": [
+    "redo_mirror_a.bin",
+    "redo_mirror_b.bin",
+    "redo_mirror_c.bin"
+  ],
+  "record_addressing": "page-local slots after applying prior selected reorganization records",
+  "recovery_lsn": 95080,
+  "start_lsn": 95001
+}

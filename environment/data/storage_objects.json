@@ -1,0 +1,7 @@
+{
+  "orders_root_object_id": "orders-v2-21df",
+  "partitioning_commit": {"source_uuid": "c2a1f0e7-5d34-4f8a-9b72-13d5e6c490ab", "gtid": 76},
+  "p_cold_object_id": "orders-v2-21df",
+  "p_hot_object_id": "orders-v2-hot-7a11",
+  "orders_stage_object_id": "orders-stage-44c1"
+}

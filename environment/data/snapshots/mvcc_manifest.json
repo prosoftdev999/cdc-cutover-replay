@@ -1,0 +1,30 @@
+{
+  "capture_lsn": 95000,
+  "format_version": 1,
+  "objects": {
+    "1": "orders-v1-6c9a",
+    "2": "orders-v2-21df"
+  },
+  "page_capture": "innodb_pages.bin",
+  "pages": [
+    410,
+    411,
+    412,
+    413,
+    414,
+    415,
+    510,
+    511,
+    512,
+    513,
+    514,
+    515
+  ],
+  "read_view": {
+    "low_limit_id": 5080,
+    "up_limit_id": 5000,
+    "view_lsn": 90000
+  },
+  "trx_history": "trx_history.bin",
+  "undo_capture": "innodb_undo.bin"
+}
